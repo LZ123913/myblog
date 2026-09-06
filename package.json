@@ -1,0 +1,37 @@
+{
+  "name": "shiguang-blog",
+  "version": "1.0.0",
+  "description": "拾光集个人博客系统",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "node backend/src/server.js",
+    "dev:client": "vite --config frontend/vite.config.js",
+    "build": "vite build --config frontend/vite.config.js",
+    "preview": "vite preview --config frontend/vite.config.js",
+    "test": "node --test tests/backend/main.test.js",
+    "init-db": "node database/scripts/init.js",
+    "seed": "node database/scripts/seed.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-async-errors": "^3.1.1",
+    "html2canvas-pro": "^1.4.7",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "marked": "^15.0.6",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.16",
+    "pinia": "^2.3.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "concurrently": "^9.1.2",
+    "vite": "^6.0.7"
+  }
+}

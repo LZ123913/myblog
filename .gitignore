@@ -1,0 +1,8 @@
+node_modules/
+frontend/dist/
+.env
+*.db
+*.db-journal
+content/images/*
+!content/images/.gitkeep
+database/data/
