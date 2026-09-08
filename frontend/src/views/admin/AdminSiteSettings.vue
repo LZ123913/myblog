@@ -22,12 +22,33 @@ const settings = reactive({
   mottos: []
 })
 
+// 关于我（authors 表）：座右铭式一句话介绍 + 自我介绍
+const authorProfile = reactive({
+  id: null,
+  motto: '',
+  bio: ''
+})
+
 const newMotto = ref('')
 
 onMounted(() => {
   bgStore.setBackground('/bg-default.jpg', true)
   loadSettings()
+  loadAuthor()
 })
+
+async function loadAuthor() {
+  try {
+    const data = await api.get('/authors')
+    if (data && data.id) {
+      authorProfile.id = data.id
+      authorProfile.motto = data.motto || ''
+      authorProfile.bio = data.bio || ''
+    }
+  } catch (err) {
+    error.value = err.message || '加载作者信息失败'
+  }
+}
 
 async function loadSettings() {
   loading.value = true
@@ -56,6 +77,15 @@ async function saveSettings() {
       mottos: settings.mottos
     })
     Object.assign(settings, data)
+    // 同步保存「关于我」（昵称/头像同步进 authors 表，保持全站一致）
+    if (authorProfile.id) {
+      await api.put(`/authors/${authorProfile.id}`, {
+        name: settings.author_name,
+        avatar: settings.author_avatar,
+        motto: authorProfile.motto,
+        bio: authorProfile.bio
+      })
+    }
     // 同步更新全局store，导航栏、关于我等页面立即生效
     siteStore.settings = data
     siteStore.loaded = true
@@ -154,6 +184,36 @@ async function handleAvatarUpload(e) {
             <div class="form-label">作者昵称</div>
             <div class="form-value">
               <input type="text" v-model="settings.author_name" class="form-input" placeholder="拾光者" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 关于我卡片 -->
+      <div class="setting-card">
+        <div class="card-header">
+          <span class="card-icon">🙋</span>
+          <div>
+            <h3>关于我</h3>
+            <p class="card-desc">展示在「关于」页面，仅管理员可编辑</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-label">一句话介绍</div>
+            <div class="form-value">
+              <input type="text" v-model="authorProfile.motto" class="form-input" placeholder="例如：全栈新手，记录学习的每一步" />
+            </div>
+          </div>
+          <div class="form-row bio-row">
+            <div class="form-label">自我介绍</div>
+            <div class="form-value">
+              <textarea
+                v-model="authorProfile.bio"
+                class="form-input form-textarea"
+                rows="5"
+                placeholder="介绍一下自己：经历、兴趣、想分享的事..."
+              ></textarea>
             </div>
           </div>
         </div>
@@ -294,6 +354,13 @@ async function handleAvatarUpload(e) {
 }
 
 .avatar-row { align-items: flex-start; }
+.bio-row { align-items: flex-start; }
+.form-textarea {
+  resize: vertical;
+  min-height: 110px;
+  line-height: 1.7;
+  font-family: inherit;
+}
 .avatar-upload {
   display: flex;
   align-items: center;
